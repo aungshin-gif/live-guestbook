@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Guestbook</title>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: white; display: flex; justify-content: center; padding: 20px; min-height: 100vh; margin: 0; }
+    .container { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 15px; }
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+    input, textarea, button { width: 100%; margin-top: 8px; padding: 10px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; }
+    button { background: #10b981; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; }
+    .msg-item { background: #0f172a; padding: 12px; border-radius: 8px; border-left: 4px solid #38bdf8; margin-bottom: 10px; }
+    .msg-name { font-weight: bold; color: #38bdf8; font-size: 14px; }
+    .msg-text { margin: 4px 0 0 0; font-size: 14px; color: #e2e8f0; }
+    .msg-time { font-size: 11px; color: #64748b; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Form အပိုင်း (Data ပို့သည့်နေရာ) -->
+    <div class="card">
+      <h3 style="margin-top:0;">💬 Message ပို့မည်</h3>
+      <input type="text" id="name" placeholder="သင့်နာမည်">
+      <textarea id="msg" placeholder="စာတို ရေးပါ..."></textarea>
+      <button onclick="sendData()">ပို့မည်</button>
+      <div id="status" style="font-size: 13px; margin-top: 8px;"></div>
+    </div>
+
+    <!-- Data ပြန်ဖော်ပြမည့် အပိုင်း (Read/Fetch) -->
+    <div class="card">
+      <h3 style="margin-top:0;">📜 ရောက်ရှိနေသော စာများ</h3>
+      <div id="messageList">ရယူနေပါသည်...</div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://gsmdkjorqeqwkkhuuqcc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_OXvm6VqHDKwifXFxFdtTjA_fOkAXM6r";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ၁။ Database ထဲက Data တွေကို ဆွဲထုတ်ယူခြင်း (Fetch / Select)
+    async function loadMessages() {
+      const list = document.getElementById("messageList");
+      
+      const { data, error } = await _supabase
+        .from('messages')
+        .select('*')
+        .order('id', { ascending: false }); // နောက်ဆုံးစာကို အပေါ်ဆုံးတင်ပြမယ်
+
+      if (error) {
+        list.innerHTML = "<span style='color:red;'>Error loading messages</span>";
+        return;
+      }
+
+      if (data.length === 0) {
+        list.innerHTML = "<span style='color:gray;'>စာတို မရှိသေးပါ</span>";
+        return;
+      }
+
+      list.innerHTML = data.map(item => `
+        <div class="msg-item">
+          <div class="msg-name">${item.name || 'Anonymous'}</div>
+          <div class="msg-text">${item.message}</div>
+          <div class="msg-time">${new Date(item.created_at).toLocaleTimeString()}</div>
+        </div>
+      `).join('');
+    }
+
+    // ၂။ Data အသစ် ပို့ခြင်း (Insert)
+    async function sendData() {
+      const name = document.getElementById("name").value;
+      const msg = document.getElementById("msg").value;
+      const status = document.getElementById("status");
+
+      if (!name || !msg) return;
+
+      status.innerText = "⏳ ပို့နေပါပြီ...";
+      const { error } = await _supabase
+        .from('messages')
+        .insert([{ name: name, message: msg }]);
+
+      if (!error) {
+        status.innerText = "✅ ပို့ပြီးပါပြီ!";
+        status.style.color = "#10b981";
+        document.getElementById("name").value = "";
+        document.getElementById("msg").value = "";
+        loadMessages(); // စာအသစ်ဝင်သွားတာနဲ့ ဇယားကို ချက်ချင်း refresh လုပ်ပြမယ်
+      }
+    }
+
+    // Website စဖွင့်တာနဲ့ Data တွေကို တန်းဆွဲပြပါ
+    loadMessages();
+  </script>
+</body>
+</html>
