@@ -1,5 +1,5 @@
 """
-Regenerates the game data embedded in store.html from g2bulk's public
+Regenerates the game data embedded in index.html from g2bulk's public
 catalogue API (https://api.g2bulk.com/v1) — no API key needed, since
 games/categories/products/catalogue are all public read endpoints.
 
@@ -20,7 +20,7 @@ What it does:
      /v1/category, tagged type "giftcard" so the frontend can filter them
      separately from games (type "game"). Edit that list to add/remove
      which gift cards show up.
-  7. Writes the result back into store.html, between the
+  7. Writes the result back into index.html, between the
      GENERATED:GAMES_JSON markers.
 
 Run it whenever you want to refresh prices/stock, or after changing
@@ -37,7 +37,7 @@ import sys
 import requests
 
 API = "https://api.g2bulk.com/v1"
-STORE_HTML = "store.html"
+STORE_HTML = "index.html"
 EXCHANGE_RATE = 4325  # 1 USD in MMK — update as the rate moves
 PINNED_FIRST = "mobile legends"  # base name (lowercase) to always show first
 HOT_GAMES = {"mobile legends"}   # base names (lowercase) that get a Hot badge
