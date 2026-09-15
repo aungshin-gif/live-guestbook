@@ -53,24 +53,31 @@ header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.82);backdro
 .search-box svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none}
 .count-pill{flex:none;font-size:12px;color:var(--text-muted);background:var(--glass-bg);border:1px solid var(--glass-border);padding:8px 13px;border-radius:999px;white-space:nowrap}
 
-/* hero poster — deliberately kept dark as a focal contrast panel on the
-   otherwise light page, so it uses its own explicit dark tokens rather
-   than the (now light) glass variables. */
+/* hero — a light carousel featuring real games' own cover art, rather
+   than a plain dark panel with just the site's own logo on it. */
 .hero-poster{
   position:relative;z-index:1;margin:28px 0 36px;border-radius:26px;overflow:hidden;
-  padding:64px 32px;text-align:center;color:#f1f0f7;
-  background:
-    radial-gradient(620px 320px at 18% 0%, rgba(139,92,246,.4), transparent 62%),
-    radial-gradient(520px 300px at 88% 100%, rgba(34,211,238,.3), transparent 62%),
-    radial-gradient(360px 260px at 50% 100%, rgba(236,72,153,.18), transparent 60%),
-    linear-gradient(165deg, #15121f 0%, #0b0b12 100%);
-  box-shadow:0 24px 50px -22px rgba(24,24,32,.35);
+  background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--card-shadow);
 }
-.poster-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:8px 18px;border-radius:999px;font-size:12.5px;font-weight:700;color:#67e8f9;margin-bottom:24px;backdrop-filter:blur(10px)}
-.poster-title{font-size:clamp(2.3rem,6.6vw,4rem);font-weight:900;letter-spacing:-.03em;line-height:1.02;margin-bottom:16px;color:#f1f0f7}
-.poster-title span{background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 30px rgba(139,92,246,.55))}
-.poster-sub{color:#b4b2c2;font-size:15px;max-width:540px;margin:0 auto}
-@media (max-width:600px){.hero-poster{padding:44px 20px;border-radius:20px;margin:18px 0 28px}}
+.hero-track{display:flex;transition:transform .5s cubic-bezier(.65,0,.35,1)}
+.hero-slide{flex:0 0 100%;display:flex;align-items:center;gap:36px;padding:52px 44px}
+.hero-slide-text{flex:1;min-width:0}
+.poster-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.18);padding:8px 18px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:20px}
+.hero-slide h2{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:900;letter-spacing:-.02em;line-height:1.08;margin-bottom:14px;color:var(--text)}
+.hero-slide p{color:var(--text-muted);font-size:14.5px;max-width:420px;line-height:1.6;margin-bottom:22px}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent-grad);color:#fff;border:none;border-radius:12px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 14px 28px -12px rgba(124,58,237,.5);transition:transform .15s ease}
+.hero-cta:hover{transform:translateY(-2px)}
+.hero-slide-art{flex:none;width:200px;height:200px;border-radius:22px;overflow:hidden;box-shadow:0 20px 40px -16px rgba(24,24,32,.35)}
+.hero-slide-art img{width:100%;height:100%;object-fit:cover}
+.hero-dots{display:flex;justify-content:center;gap:6px;padding:0 0 22px}
+.hero-dot{width:22px;height:4px;border-radius:2px;background:var(--glass-border);border:none;cursor:pointer;transition:background .2s ease}
+.hero-dot.active{background:var(--accent)}
+@media (max-width:680px){
+  .hero-slide{flex-direction:column-reverse;text-align:center;padding:32px 24px 8px;gap:20px}
+  .hero-slide-text{max-width:100%}
+  .hero-slide p{margin-left:auto;margin-right:auto}
+  .hero-slide-art{width:150px;height:150px}
+}
 
 .category-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
 .cat-tab{padding:12px 22px;border-radius:999px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:all .18s ease}
@@ -83,7 +90,7 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 .glass{background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--card-shadow)}
 
 /* catalog grid */
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .card{
   background:var(--glass-bg);border:1px solid var(--glass-border);
   border-radius:16px;overflow:hidden;cursor:pointer;
@@ -265,10 +272,9 @@ footer a{color:var(--cta2);text-decoration:none;font-weight:600}
 <main class="wrap">
 
   <section id="view-catalog">
-    <div class="hero-poster">
-      <div class="poster-badge">🎮 Game Top-Up Store</div>
-      <h1 class="poster-title">GamePay<span>Hub</span></h1>
-      <p class="poster-sub">Every game top-up and gift card in one place — priced in Kyats, ordered on Telegram.</p>
+    <div class="hero-poster" id="hero">
+      <div class="hero-track" id="hero-track"></div>
+      <div class="hero-dots" id="hero-dots"></div>
     </div>
     <div class="category-tabs" id="category-tabs">
       <button class="cat-tab active" data-type="all">All Products</button>
@@ -463,6 +469,60 @@ var els = {
 els.fieldsTipBtn.addEventListener('click', function(){ els.fieldsTip.hidden = !els.fieldsTip.hidden; });
 
 els.countPill.textContent = GAMES.length + ' products';
+
+/* ---------------- hero carousel ---------------- */
+/* Real cover art for a few popular titles, not a plain text banner.
+   Taglines state only what's actually true (no invented discounts/stats). */
+var HERO_SLIDES = [
+  { slug: 'mobile-legends', name: 'Mobile Legends', tagline: 'Instant Diamonds top-up, every region — pay by KPay, Wave Pay, UAB or AYA.' },
+  { slug: 'pubg-mobile', name: 'PUBG Mobile', tagline: 'UC delivered straight to your account, no waiting around.' },
+  { slug: 'genshin-impact', name: 'Genshin Impact', tagline: 'Genesis Crystals for every server, ordered straight from Telegram.' }
+];
+(function initHero(){
+  var slides = HERO_SLIDES.map(function(s){ return GAMES.filter(function(g){ return g.slug === s.slug; })[0] ? Object.assign({}, s) : null; }).filter(Boolean);
+  if (!slides.length) { document.getElementById('hero').hidden = true; return; }
+  var track = document.getElementById('hero-track');
+  var dotsWrap = document.getElementById('hero-dots');
+  var game = GAMES.reduce(function(m, g){ m[g.slug] = g; return m; }, {});
+
+  track.innerHTML = slides.map(function(s){
+    var g = game[s.slug];
+    return '<div class="hero-slide">' +
+      '<div class="hero-slide-text">' +
+        '<div class="poster-badge">🎮 Game Top-Up Store</div>' +
+        '<h2>' + escapeHtml(s.name) + '</h2>' +
+        '<p>' + escapeHtml(s.tagline) + '</p>' +
+        '<button class="hero-cta" data-slug="' + s.slug + '">Top Up Now' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="hero-slide-art">' + thumbHtml(g) + '</div>' +
+    '</div>';
+  }).join('');
+  dotsWrap.innerHTML = slides.map(function(_, i){
+    return '<button class="hero-dot' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" aria-label="Slide ' + (i + 1) + '"></button>';
+  }).join('');
+
+  var idx = 0;
+  function go(i){
+    idx = (i + slides.length) % slides.length;
+    track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+    dotsWrap.querySelectorAll('.hero-dot').forEach(function(d, di){ d.classList.toggle('active', di === idx); });
+  }
+  var timer = setInterval(function(){ go(idx + 1); }, 5500);
+  dotsWrap.addEventListener('click', function(e){
+    var d = e.target.closest('.hero-dot');
+    if (!d) return;
+    go(+d.dataset.i);
+    clearInterval(timer);
+    timer = setInterval(function(){ go(idx + 1); }, 5500);
+  });
+  track.addEventListener('click', function(e){
+    var btn = e.target.closest('.hero-cta');
+    if (!btn) return;
+    location.hash = '#/game/' + btn.dataset.slug;
+  });
+})();
 
 /* ---------------- catalog / infinite scroll ---------------- */
 function cardHtml(g){
