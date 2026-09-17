@@ -12,11 +12,11 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f1f1f5;
-  --glass-bg:#ffffff;
-  --glass-bg-strong:#ffffff;
-  --glass-border:#e5e5eb;
-  --glass-blur:blur(20px);
+  --bg:#f0f1f6;
+  --glass-bg:rgba(255,255,255,.5);
+  --glass-bg-strong:rgba(255,255,255,.78);
+  --glass-border:rgba(124,58,237,.16);
+  --glass-blur:blur(22px);
   --text:#1c1c22;
   --text-muted:#6c6c78;
   --accent:#7c3aed;
@@ -27,7 +27,7 @@
   --cta2-grad:linear-gradient(135deg,#06b6d4 0%,#2563eb 100%);
   --hot-grad:linear-gradient(135deg,#f97316 0%,#e11d48 100%);
   --success:#059669;
-  --card-shadow:0 1px 2px rgba(24,24,32,.04), 0 10px 24px -14px rgba(24,24,32,.14);
+  --card-shadow:0 1px 2px rgba(24,24,32,.04), 0 10px 28px -16px rgba(124,58,237,.18);
   --font:'Inter',system-ui,-apple-system,sans-serif;
   --maxw:1240px;
 }
@@ -39,25 +39,37 @@ button{font-family:var(--font)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 [hidden]{display:none!important}
 
+/* soft ambient color behind the glass panels — without it, translucent
+   "glass" surfaces have nothing to show through and just look flat grey */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(720px 480px at 8% -8%, rgba(124,58,237,.24), transparent 62%),
+    radial-gradient(620px 440px at 94% 4%, rgba(8,145,178,.22), transparent 62%),
+    radial-gradient(600px 480px at 50% 108%, rgba(219,39,119,.18), transparent 60%),
+    radial-gradient(520px 420px at 30% 45%, rgba(249,115,22,.10), transparent 60%);
+}
+
 /* header */
-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.82);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border)}
+header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.68);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border)}
 .header-inner{display:flex;align-items:center;gap:18px;height:72px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.01em;flex:none;cursor:pointer;background:none;border:none;color:inherit;padding:0}
 .brand .mark{width:34px;height:34px;border-radius:10px;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;box-shadow:0 8px 20px -6px rgba(124,58,237,.5)}
 .brand .sub{font-size:11px;color:var(--text-muted);font-weight:500;display:block;margin-top:1px}
 .brand-text{display:flex;flex-direction:column;line-height:1.15;text-align:left}
 .search-box{flex:1;max-width:440px;position:relative;margin-left:auto}
-.search-box input{width:100%;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:11px;padding:11px 16px 11px 40px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s ease, background .2s ease}
+.search-box input{width:100%;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:11px;padding:11px 16px 11px 40px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s ease, background .2s ease}
 .search-box input:focus{border-color:var(--accent);background:var(--glass-bg-strong)}
 .search-box input::placeholder{color:var(--text-muted)}
 .search-box svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none}
-.count-pill{flex:none;font-size:12px;color:var(--text-muted);background:var(--glass-bg);border:1px solid var(--glass-border);padding:8px 13px;border-radius:999px;white-space:nowrap}
+.count-pill{flex:none;font-size:12px;color:var(--text-muted);background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);padding:8px 13px;border-radius:999px;white-space:nowrap}
 
 /* hero — a light carousel featuring real games' own cover art, rather
    than a plain dark panel with just the site's own logo on it. */
 .hero-poster{
   position:relative;z-index:1;margin:28px 0 36px;border-radius:26px;overflow:hidden;
   background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--card-shadow);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
 }
 .hero-track{display:flex;transition:transform .5s cubic-bezier(.65,0,.35,1)}
 .hero-slide{flex:0 0 100%;display:flex;align-items:center;gap:36px;padding:52px 44px}
@@ -79,20 +91,47 @@ header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.82);backdro
   .hero-slide-art{width:150px;height:150px}
 }
 
+/* fresh sale — an auto-scrolling ticker of real current starting prices
+   (sorted cheapest-first from the live catalog). No invented discount
+   percentages, ratings, or sold-counts — just real "From X Ks" prices. */
+.fresh-sale{border-radius:20px;padding:16px 0 18px;overflow:hidden;margin-bottom:26px}
+.fresh-sale-head{display:flex;align-items:center;gap:9px;padding:0 20px 13px;font-size:14px;font-weight:800}
+.fresh-sale-head .flame{filter:drop-shadow(0 2px 6px rgba(244,63,94,.4))}
+.marquee-mask{-webkit-mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent)}
+.marquee-track{display:flex;gap:12px;width:max-content;padding:0 20px;animation:marquee 34s linear infinite}
+.marquee-track:hover{animation-play-state:paused}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.deal-chip{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--glass-bg-strong);border:1px solid var(--glass-border);border-radius:13px;padding:7px 16px 7px 7px;cursor:pointer;transition:border-color .15s ease,transform .15s ease}
+.deal-chip:hover{border-color:var(--accent);transform:translateY(-2px)}
+.deal-thumb{width:34px;height:34px;border-radius:8px;overflow:hidden;background:#f0f0f5;flex:none;position:relative}
+.deal-thumb img{width:100%;height:100%;object-fit:cover}
+.deal-chip .dname{font-size:12px;font-weight:700;white-space:nowrap;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.deal-chip .dprice{font-size:11px;color:var(--success);font-weight:700;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.marquee-track{animation:none;overflow-x:auto}}
+
+/* most popular — a horizontally-scrolling row of real hot-flagged items
+   from the catalog (same "hot" flag the 🔥 badge elsewhere uses) */
+.popular-section{margin-bottom:30px}
+.popular-track{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.popular-track .card{flex:0 0 168px;scroll-snap-align:start}
+.popular-track::-webkit-scrollbar{height:6px}
+.popular-track::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:3px}
+
 .category-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
-.cat-tab{padding:12px 22px;border-radius:999px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:all .18s ease}
+.cat-tab{padding:12px 22px;border-radius:999px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);color:var(--text-muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:all .18s ease}
 .cat-tab:hover{border-color:rgba(124,58,237,.4);color:var(--text)}
 .cat-tab.active{background:var(--accent-grad);color:#fff;border-color:transparent;box-shadow:0 10px 24px -8px rgba(124,58,237,.4)}
 
 main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 
 /* card/panel surface — solid white now rather than translucent-on-dark */
-.glass{background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--card-shadow)}
+.glass{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--card-shadow)}
 
 /* catalog grid */
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .card{
   background:var(--glass-bg);border:1px solid var(--glass-border);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-radius:16px;overflow:hidden;cursor:pointer;
   box-shadow:var(--card-shadow);
   transition:transform .2s cubic-bezier(.22,1,.36,1), border-color .2s ease, box-shadow .2s ease;
@@ -145,7 +184,7 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 .section-label::before{content:"";width:14px;height:2px;border-radius:2px;background:var(--accent-grad);flex:none}
 
 .category-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
-.chip{padding:10px 18px;border-radius:999px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s ease}
+.chip{padding:10px 18px;border-radius:999px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s ease}
 .chip:hover{border-color:#0891b2;color:var(--text)}
 .chip.selected{background:var(--cta2-grad);color:#fff;border-color:transparent;box-shadow:0 10px 22px -8px rgba(8,145,178,.4)}
 
@@ -154,12 +193,12 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 .step-num{width:25px;height:25px;border-radius:50%;background:var(--accent-grad);color:#fff;font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex:none}
 .step-num.small{width:21px;height:21px;font-size:11.5px}
 .step-title{font-size:14.5px;font-weight:700}
-.tip-btn{width:20px;height:20px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-muted);font-size:11px;font-weight:800;cursor:pointer;margin-left:auto;flex:none;line-height:1}
+.tip-btn{width:20px;height:20px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);color:var(--text-muted);font-size:11px;font-weight:800;cursor:pointer;margin-left:auto;flex:none;line-height:1}
 .tip-btn:hover{border-color:var(--cta2);color:var(--cta2)}
-.step-tip{background:#f6f6fa;border:1px solid var(--glass-border);border-radius:12px;padding:11px 15px;font-size:12.5px;line-height:1.55;color:var(--text-muted);margin-bottom:16px}
+.step-tip{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:12px;padding:11px 15px;font-size:12.5px;line-height:1.55;color:var(--text-muted);margin-bottom:16px}
 
 .denom-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:11px}
-.denom-card{background:var(--glass-bg);border:1.5px solid var(--glass-border);border-radius:13px;padding:15px 12px;text-align:center;cursor:pointer;box-shadow:var(--card-shadow);transition:border-color .15s ease,transform .15s ease,background .15s ease}
+.denom-card{background:var(--glass-bg);border:1.5px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:13px;padding:15px 12px;text-align:center;cursor:pointer;box-shadow:var(--card-shadow);transition:border-color .15s ease,transform .15s ease,background .15s ease}
 .denom-card:hover{border-color:#67c9dd;transform:translateY(-2px)}
 .denom-card.selected{border-color:var(--cta2);background:rgba(8,145,178,.06);box-shadow:0 0 0 1px var(--cta2) inset,0 14px 28px -14px rgba(8,145,178,.35)}
 .denom-name{font-size:12px;color:var(--text-muted);margin-bottom:7px;line-height:1.3;min-height:2.2em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -167,7 +206,7 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 .denom-card.selected .denom-price{color:#0e7490}
 .denom-grid.capped{max-height:400px;overflow:hidden;position:relative}
 .denom-grid.capped::after{content:"";position:absolute;left:0;right:0;bottom:0;height:72px;background:linear-gradient(to bottom,transparent,var(--bg));pointer-events:none}
-.show-more-btn{display:block;width:100%;margin-top:12px;padding:12px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:12px;color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:border-color .15s ease}
+.show-more-btn{display:block;width:100%;margin-top:12px;padding:12px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:12px;color:var(--text);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:border-color .15s ease}
 .show-more-btn:hover{border-color:var(--cta2)}
 
 /* checkout view */
@@ -183,13 +222,13 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 .buy-bar .confirm-btn{flex:none;padding:13px 22px;font-size:14px}
 
 .pay-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.pay-option{background:var(--glass-bg);border:2px solid var(--glass-border);border-radius:14px;padding:16px;cursor:pointer;text-align:center;box-shadow:var(--card-shadow);transition:border-color .15s ease,background .15s ease,transform .15s ease;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pay-option{background:var(--glass-bg);border:2px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:14px;padding:16px;cursor:pointer;text-align:center;box-shadow:var(--card-shadow);transition:border-color .15s ease,background .15s ease,transform .15s ease;display:flex;flex-direction:column;align-items:center;gap:10px}
 .pay-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 8px 18px -6px rgba(0,0,0,.35)}
 .pay-option:hover{border-color:#67c9dd;transform:translateY(-2px)}
 .pay-option.selected{border-color:var(--cta2);background:rgba(8,145,178,.06)}
 .pay-option .pname{font-size:14px;font-weight:700}
 
-.pay-detail{background:#f6f6fa;border:1px solid var(--glass-border);border-radius:14px;padding:16px 18px;display:none;flex-direction:column;gap:8px}
+.pay-detail{background:var(--glass-bg-strong);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:14px;padding:16px 18px;display:none;flex-direction:column;gap:8px}
 .pay-detail.show{display:flex}
 .pay-detail .row{display:flex;align-items:center;justify-content:space-between;font-size:13.5px}
 .pay-detail .row b{font-weight:700}
@@ -199,7 +238,7 @@ main{position:relative;z-index:1;padding-bottom:80px;min-height:60vh}
 
 .field-block{margin-bottom:18px}
 .field-block:last-child{margin-bottom:0}
-.text-input{width:100%;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:12px;padding:13px 15px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s ease}
+.text-input{width:100%;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-radius:12px;padding:13px 15px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s ease}
 .text-input:focus{border-color:var(--cta2)}
 select.text-input{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c6c78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 .notes-banner{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:12px 15px;font-size:12.5px;line-height:1.5}
@@ -218,7 +257,8 @@ select.text-input{appearance:none;-webkit-appearance:none;background-image:url("
 .preview-modal{
   width:100%;max-width:460px;max-height:88vh;overflow-y:auto;border-radius:22px 22px 0 0;
   padding:26px 24px 24px;transform:translateY(28px);transition:transform .28s cubic-bezier(.22,1,.36,1);
-  background:var(--glass-bg);box-shadow:0 30px 70px -20px rgba(24,24,32,.45);
+  background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 30px 70px -20px rgba(24,24,32,.45);
 }
 @media (min-width:640px){.preview-modal{border-radius:22px}}
 .overlay.open .preview-modal{transform:translateY(0)}
@@ -235,14 +275,14 @@ select.text-input{appearance:none;-webkit-appearance:none;background-image:url("
 .preview-line .v{font-weight:700;text-align:right;word-break:break-word}
 .preview-line.total .v{color:var(--success);font-size:17px;font-weight:800}
 .preview-actions{display:flex;flex-direction:column;gap:10px}
-.edit-btn{background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-muted);border-radius:12px;padding:13px;font-size:13.5px;font-weight:700;cursor:pointer;transition:border-color .15s ease,color .15s ease}
+.edit-btn{background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);color:var(--text-muted);border-radius:12px;padding:13px;font-size:13.5px;font-weight:700;cursor:pointer;transition:border-color .15s ease,color .15s ease}
 .edit-btn:hover{border-color:var(--cta2);color:var(--text)}
 
 footer{position:relative;z-index:1;border-top:1px solid var(--glass-border);padding:26px 0;text-align:center}
 footer p{font-size:12px;color:var(--text-muted)}
 footer a{color:var(--cta2);text-decoration:none;font-weight:600}
 
-@media (max-width:760px){ .grid{grid-template-columns:repeat(3,1fr);gap:10px} .pay-grid{grid-template-columns:1fr 1fr} .denom-grid{gap:9px} }
+@media (max-width:760px){ .grid{grid-template-columns:repeat(3,1fr);gap:10px} .pay-grid{grid-template-columns:1fr 1fr} .denom-grid{gap:9px} .popular-track .card{flex-basis:132px} }
 @media (max-width:600px){
   .brand .sub{display:none}
   .count-pill{display:none}
@@ -276,6 +316,17 @@ footer a{color:var(--cta2);text-decoration:none;font-weight:600}
       <div class="hero-track" id="hero-track"></div>
       <div class="hero-dots" id="hero-dots"></div>
     </div>
+
+    <section class="fresh-sale glass" id="fresh-sale" hidden>
+      <div class="fresh-sale-head"><span class="flame">🔥</span> Fresh Sale — today's starting prices</div>
+      <div class="marquee-mask"><div class="marquee-track" id="fresh-track"></div></div>
+    </section>
+
+    <section class="popular-section" id="popular-section" hidden>
+      <div class="section-label">✨ Most Popular</div>
+      <div class="popular-track" id="popular-track"></div>
+    </section>
+
     <div class="category-tabs" id="category-tabs">
       <button class="cat-tab active" data-type="all">All Products</button>
       <button class="cat-tab" data-type="game">Games</button>
@@ -524,6 +575,52 @@ var HERO_SLIDES = [
   });
 })();
 
+function openGameByIdx(idx){ location.hash = '#/game/' + GAMES[+idx].slug; }
+
+/* ---------------- most popular + fresh sale rails ---------------- */
+/* "Most Popular" is an editorial pick of real, globally well-known titles
+   that happen to exist in this catalog — the same kind of curation already
+   used for the hero carousel above, not a fabricated site statistic (we
+   have no real sales/view counts to rank by). Fresh Sale uses only real
+   startMmk prices. Neither invents ratings, sold-counts, or discounts. */
+var POPULAR_SLUGS = [
+  'mobile-legends', 'pubg-mobile', 'freefire', 'honor-of-kings', 'genshin-impact',
+  'call-of-duty-mobile-garena', 'valorant', 'league-of-legends', 'wild-rift',
+  'honkai-star-rail', 'zenless-zone-zero'
+];
+(function initPopular(){
+  var bySlug = GAMES.reduce(function(m, g){ m[g.slug] = g; return m; }, {});
+  var popular = POPULAR_SLUGS.map(function(s){ return bySlug[s]; }).filter(Boolean);
+  if (!popular.length) popular = GAMES.filter(function(g){ return g.hot; });
+  if (!popular.length) return;
+  document.getElementById('popular-section').hidden = false;
+  document.getElementById('popular-track').innerHTML = popular.map(cardHtml).join('');
+})();
+
+function dealChipHtml(g){
+  return '<div class="deal-chip" data-idx="' + g._idx + '">' +
+    '<div class="deal-thumb">' + thumbHtml(g) + '</div>' +
+    '<div><div class="dname">' + escapeHtml(g.name) + '</div><div class="dprice">From ' + fmt(g.startMmk) + ' Ks</div></div>' +
+  '</div>';
+}
+(function initFreshSale(){
+  var items = GAMES.filter(function(g){ return g.startMmk; })
+    .slice().sort(function(a, b){ return a.startMmk - b.startMmk; }).slice(0, 14);
+  if (!items.length) return;
+  document.getElementById('fresh-sale').hidden = false;
+  var html = items.map(dealChipHtml).join('');
+  document.getElementById('fresh-track').innerHTML = html + html; // duplicated once for a seamless loop
+})();
+
+document.getElementById('popular-track').addEventListener('click', function(e){
+  var card = e.target.closest('.card');
+  if (card) openGameByIdx(card.dataset.idx);
+});
+document.getElementById('fresh-track').addEventListener('click', function(e){
+  var chip = e.target.closest('.deal-chip');
+  if (chip) openGameByIdx(chip.dataset.idx);
+});
+
 /* ---------------- catalog / infinite scroll ---------------- */
 function cardHtml(g){
   var priceHtml = g.startMmk
@@ -607,8 +704,7 @@ document.getElementById('category-tabs').addEventListener('click', function(e){
 
 els.grid.addEventListener('click', function(e){
   var card = e.target.closest('.card');
-  if (!card) return;
-  location.hash = '#/game/' + GAMES[+card.dataset.idx].slug;
+  if (card) openGameByIdx(card.dataset.idx);
 });
 
 function nearBottom(){
